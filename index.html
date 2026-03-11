@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Ubuntu VPS — Control Panel</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0d1117;--card:#161b22;--border:#30363d;
+  --text:#e6edf3;--dim:#8b949e;--blue:#58a6ff;
+  --green:#3fb950;--yellow:#d29922;--red:#f85149;
+  --hover:#1f2937;
+}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+a{color:inherit;text-decoration:none}
+
+/* ── Header ── */
+.hdr{background:linear-gradient(135deg,#161b22 0%,#1a2332 100%);border-bottom:1px solid var(--border);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center}
+.hdr h1{font-size:1.4rem;display:flex;align-items:center;gap:.6rem}
+.hdr h1 span{font-size:1.6rem}
+.status{display:flex;align-items:center;gap:.5rem;color:var(--green);font-weight:500;font-size:.9rem}
+.dot{width:9px;height:9px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(63,185,80,.5)}70%{box-shadow:0 0 0 8px rgba(63,185,80,0)}}
+
+/* ── Container ── */
+.wrap{max-width:1100px;margin:0 auto;padding:1.5rem}
+
+/* ── Stat cards ── */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.5rem}
+.st{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.2rem}
+.st h3{font-size:.75rem;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.6rem;display:flex;align-items:center;gap:.4rem}
+.st .val{font-size:1.6rem;font-weight:700}
+.st .sub{font-size:.8rem;color:var(--dim);margin-top:.2rem}
+.bar{height:5px;background:#21262d;border-radius:3px;margin-top:.7rem;overflow:hidden}
+.bar div{height:100%;border-radius:3px;transition:width .6s ease}
+.g{background:var(--green)}.y{background:var(--yellow)}.r{background:var(--red)}
+
+/* ── Action buttons ── */
+.acts{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;margin-bottom:1.5rem}
+.act{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.4rem;display:flex;align-items:center;gap:1rem;transition:all .2s;cursor:pointer}
+.act:hover{border-color:var(--blue);transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,0,0,.3)}
+.act-i{font-size:1.8rem;min-width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:#21262d;border-radius:10px}
+.act h3{font-size:1rem;margin-bottom:.2rem}
+.act p{font-size:.85rem;color:var(--dim)}
+
+/* ── Info panels ── */
+.info{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.4rem;margin-bottom:1rem}
+.info h2{font-size:1rem;margin-bottom:1rem;padding-bottom:.7rem;border-bottom:1px solid #21262d;display:flex;align-items:center;gap:.5rem}
+.igrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.4rem}
+.irow{display:flex;justify-content:space-between;padding:.45rem 0;font-size:.9rem}
+.irow .lbl{color:var(--dim)}
+.irow .v{font-weight:600}
+
+/* ── Tags ── */
+.tags{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.5rem}
+.tag{background:#21262d;padding:.35rem .8rem;border-radius:6px;font-family:'SFMono-Regular',Consolas,monospace;font-size:.82rem;color:var(--blue);border:1px solid transparent;transition:border .2s;cursor:default}
+.tag:hover{border-color:var(--border)}
+
+/* ── Footer ── */
+.foot{text-align:center;padding:2rem 1rem;color:#484f58;font-size:.82rem}
+
+/* ── Responsive ── */
+@media(max-width:600px){
+  .hdr{padding:.8rem 1rem}
+  .wrap{padding:1rem}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .acts{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1><span>🐧</span> Ubuntu VPS</h1>
+  <div class="status"><div class="dot"></div> Online</div>
+</div>
+
+<div class="wrap">
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="st">
+      <h3>🧮 CPU</h3>
+      <div class="val" id="cpu">—</div>
+      <div class="sub" id="cpusub">Load: —</div>
+      <div class="bar"><div id="cpubar" class="g" style="width:0%"></div></div>
+    </div>
+    <div class="st">
+      <h3>🧠 Memory</h3>
+      <div class="val" id="mem">—</div>
+      <div class="sub" id="memsub">— / — MB</div>
+      <div class="bar"><div id="membar" class="g" style="width:0%"></div></div>
+    </div>
+    <div class="st">
+      <h3>💾 Disk</h3>
+      <div class="val" id="dsk">—</div>
+      <div class="sub" id="dsksub">— / — MB</div>
+      <div class="bar"><div id="dskbar" class="g" style="width:0%"></div></div>
+    </div>
+    <div class="st">
+      <h3>⏱️ Uptime</h3>
+      <div class="val" id="up" style="font-size:1.1rem">—</div>
+      <div class="sub" id="procs">Processes: —</div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="acts">
+    <a href="/terminal/" target="_blank" class="act">
+      <div class="act-i">🖥️</div>
+      <div><h3>Web Terminal</h3><p>Full Ubuntu bash shell in your browser</p></div>
+    </a>
+    <a href="/files/" target="_blank" class="act">
+      <div class="act-i">📁</div>
+      <div><h3>File Manager</h3><p>Upload, download &amp; manage files</p></div>
+    </a>
+  </div>
+
+  <!-- System info -->
+  <div class="info">
+    <h2>📋 System Information</h2>
+    <div class="igrid">
+      <div class="irow"><span class="lbl">Hostname</span><span class="v" id="hn">—</span></div>
+      <div class="irow"><span class="lbl">OS</span><span class="v">Ubuntu 22.04 LTS</span></div>
+      <div class="irow"><span class="lbl">Kernel</span><span class="v" id="kn">—</span></div>
+      <div class="irow"><span class="lbl">Node.js</span><span class="v">v20.x</span></div>
+      <div class="irow"><span class="lbl">Python</span><span class="v">3.10.x</span></div>
+      <div class="irow"><span class="lbl">Go</span><span class="v">1.22.x</span></div>
+    </div>
+  </div>
+
+  <!-- Quick commands -->
+  <div class="info">
+    <h2>⚡ Quick Commands</h2>
+    <div class="tags">
+      <span class="tag">help-vps</span>
+      <span class="tag">sysinfo</span>
+      <span class="tag">sysload</span>
+      <span class="tag">myip</span>
+      <span class="tag">meminfo</span>
+      <span class="tag">diskinfo</span>
+      <span class="tag">cpuinfo</span>
+      <span class="tag">ports</span>
+      <span class="tag">topmem</span>
+      <span class="tag">topcpu</span>
+      <span class="tag">htop</span>
+      <span class="tag">tmux</span>
+      <span class="tag">update</span>
+      <span class="tag">install &lt;pkg&gt;</span>
+      <span class="tag">speed</span>
+      <span class="tag">weather</span>
+      <span class="tag">serve</span>
+    </div>
+  </div>
+
+  <!-- Installed software -->
+  <div class="info">
+    <h2>📦 Pre-installed</h2>
+    <div class="tags">
+      <span class="tag">python3</span>
+      <span class="tag">pip</span>
+      <span class="tag">node</span>
+      <span class="tag">npm</span>
+      <span class="tag">yarn</span>
+      <span class="tag">pm2</span>
+      <span class="tag">go</span>
+      <span class="tag">gcc / g++</span>
+      <span class="tag">make / cmake</span>
+      <span class="tag">git</span>
+      <span class="tag">curl / wget</span>
+      <span class="tag">vim / nano</span>
+      <span class="tag">htop</span>
+      <span class="tag">tmux / screen</span>
+      <span class="tag">nmap</span>
+      <span class="tag">cloudflared</span>
+      <span class="tag">ssh</span>
+    </div>
+  </div>
+
+</div>
+
+<div class="foot">Ubuntu VPS on Render.com &bull; Free Tier &bull; <span id="clock"></span></div>
+
+<script>
+function c(i){return document.getElementById(i)}
+function cls(pct){return pct>85?'r':pct>55?'y':'g'}
+
+async function refresh(){
+  try{
+    const r=await fetch('/stats.json');
+    const d=await r.json();
+
+    /* CPU */
+    c('cpu').textContent=d.cores+' Core'+(d.cores>1?'s':'');
+    const cpuPct=Math.min(100,Math.round((parseFloat(d.load1)/d.cores)*100));
+    c('cpusub').textContent='Load: '+d.load1+' / '+d.load5;
+    const cb=c('cpubar');cb.style.width=cpuPct+'%';cb.className=cls(cpuPct);
+
+    /* Memory */
+    c('mem').textContent=d.mem_pct+'%';
+    c('memsub').textContent=d.mem_used+' / '+d.mem_total+' MB';
+    const mb=c('membar');mb.style.width=d.mem_pct+'%';mb.className=cls(d.mem_pct);
+
+    /* Disk */
+    c('dsk').textContent=d.disk_pct+'%';
+    c('dsksub').textContent=d.disk_used+' / '+d.disk_total+' MB';
+    const db=c('dskbar');db.style.width=d.disk_pct+'%';db.className=cls(d.disk_pct);
+
+    /* Info */
+    c('up').textContent=d.uptime||'—';
+    c('procs').textContent='Processes: '+d.procs;
+    c('hn').textContent=d.hostname;
+    c('kn').textContent=d.kernel||'—';
+  }catch(e){console.warn('stats:',e)}
+}
+
+/* Clock */
+setInterval(()=>{c('clock').textContent=new Date().toUTCString()},1000);
+
+refresh();
+setInterval(refresh,5000);
+</script>
+</body>
+</html>
